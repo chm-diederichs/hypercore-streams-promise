@@ -32,16 +32,17 @@ class ReadStream extends Readable {
   }
 
   async _read (cb) {
-    try {
-      if (this.index === this.end || (this.end === -1 && this.index >= this.feed.length)) {
-        this.push(null)
-        return cb(null)
+    if (this.index === this.end || (this.end === -1 && this.index >= this.feed.length)) {
+      this.push(null)
+      cb(null)
+    } else {
+      try {
+        this.push(await this.feed.get(this.index++, this.options))
+      } catch (err) {
+        return cb(err)
       }
-      this.push(await this.feed.get(this.index++, this.options))
-    } catch (err) {
-      return cb(err)
+      cb(null)
     }
-    cb(null)
   }
 
   _destory (cb) {
